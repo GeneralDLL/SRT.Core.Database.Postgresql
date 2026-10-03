@@ -1,0 +1,36 @@
+---
+description: SRT.Core.Database.Postgresql — follow package AI_RULES when using or changing PostgreSQL DB infrastructure
+alwaysApply: false
+globs: "**/*Database*Postgresql*/**/*","**/SRT.Core.Database.Postgresql*/**/*","**/docs/SRT.Core.Database.Postgresql.*"
+---
+
+# SRT.Core.Database.Postgresql (Cursor rule template)
+
+This file is an **install template**. Copy it to the consumer project’s `.cursor/rules/` and keep the package-prefixed filename:
+
+`SRT.Core.Database.Postgresql.CURSOR_RULE.mdc`
+
+## Mandatory
+
+Before using or modifying this package, follow:
+
+- `docs/SRT.Core.Database.Postgresql.AI_RULES.md` (canonical)
+- `docs/SRT.Core.Database.Postgresql.API_REFERENCE.md`
+- `docs/SRT.Core.Database.Postgresql.COOKBOOK.md` for new DbContext / Repo / UoW
+
+## Working rule
+
+Read docs first. Do not invent APIs. If ambiguous, inspect related code and update the docs.
+
+## Hard constraints (summary)
+
+- Thin host `Program.cs`; no host `UseAuthorization` / `MapControllers`
+- Shared scoped `PostgreSqlDataBase` across UoW repos; never dispose in repos
+- `autoSave: true` saves entire context; `DeleteByFilterAsync` is immediate
+- Bulk + tracked only inside `ExecuteInTransactionAsync`
+- Whitelist order fields for user search input; `PaginationHelper.MaxPageSize = 500`
+- `RunIdentityGapFix` default false; never `setval` downward at startup
+- Cache / ErrorLog: inherit `PostgreSqlDataBase`, do **not** use Repo/UoW bases
+- Durable cache is keyed `CacheServiceKeys.Sql` (`"sql"`); the key does not select SQL Server; `connectionType` does
+- Postgres-only hosts: `connectionType` `postgresql` / `postgres` / `postgress`; do not reference SQL Server package
+- Bind `Service` in every env appsettings
